@@ -17,7 +17,7 @@ URI 包含 URL 和 URN。**URI** 的作用像**身份证号**一样，**URL** �
 - 资源定位符 URL 是对可以从互联网上得到的资源的位置和访问方法的一种简洁表示。
 - URL 给资源的位置提供一种抽象的识别方法，并用这种方法给资源定位。
 - 只要能够对资源定位，系统就可以对资源进行各种操作，如存取、更新、替换和查找其属性。
-- URL 相当于一个文件名在网络范围的扩展。因此 URL 是与互联网相连的机器上的任何可访问对象的一个指针。 
+- URL 相当于一个文件名在网络范围的扩展。因此 URL 是与互联网相连的机器上的任何可访问对象的一个指针。
 
 ##### 2. **URL的一般格式**
 
@@ -57,22 +57,22 @@ GET 请求的参数直接在 URL 中，没有请求体，而 POST 请求的参�
 
 ```http
 POST /search HTTP/1.1        
-Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-excel, application/vnd.ms-powerpoint, 
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/vnd.ms-excel, application/vnd.ms-powerpoint,
 application/msword, application/x-silverlight, application/x-shockwave-flash, */*  
 Referer: http://www.google.cn/  
 Accept-Language: zh-cn  
 Accept-Encoding: gzip, deflate  
 User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727; TheWorld)  
-Host: www.google.cn 
+Host: www.google.cn
 Connection: Keep-Alive  
-Cookie: PREF=ID=80a06da87be9ae3c:U=f7167333e2c3b714:NW=1:TM=1261551909:LM=1261551917:S=ybYcq2wpfefs4V9g; 
+Cookie: PREF=ID=80a06da87be9ae3c:U=f7167333e2c3b714:NW=1:TM=1261551909:LM=1261551917:S=ybYcq2wpfefs4V9g;
 NID=31=ojj8d-IygaEtSxLgaJmqSjVhCspkviJrB6omjamNrSm8lZhKy_yMfO2M4QMRKcH1g0iQv9u-2hfBW7bUFwVh7pGaRUb0RnHcJU37y-
 FxlRugatx63JLv7CWMD6UB_O_r  
 										# 空行
 hl=zh-CN&source=hp&q=domety  			# 请求体
 ```
 
-##### 2. 响应报文 
+##### 2. 响应报文
 
 <img src="assets/image-20191229152226696.png" alt="image-20191229152226696" style="zoom: 50%;" />
 
@@ -687,9 +687,9 @@ HTTP 协议是**无状态**的，主要是为了让 HTTP 协议尽可能简单�
 > 如何理解HTTP协议是无状态的？
 
 ```
-HTTP协议是无状态的（stateless），指的是协议对于事务处理没有记忆能力，服务器不知道客户端是什么状态。也就是说，打开一个服务器上的网页和上一次打开这个服务器上的网页之间没有任何联系。HTTP是一个无状态的面向连接的协议，无状态不代表HTTP不能保持TCP连接，更不能代表HTTP使用的是UDP协议（无连接）。 
+HTTP协议是无状态的（stateless），指的是协议对于事务处理没有记忆能力，服务器不知道客户端是什么状态。也就是说，打开一个服务器上的网页和上一次打开这个服务器上的网页之间没有任何联系。HTTP是一个无状态的面向连接的协议，无状态不代表HTTP不能保持TCP连接，更不能代表HTTP使用的是UDP协议（无连接）。
 
-缺少状态意味着如果后续处理需要前面的信息，则它必须重传，这样可能导致每次连接传送的数据量增大。另一方面，在服务器不需要先前信息时它的应答就较快。 
+缺少状态意味着如果后续处理需要前面的信息，则它必须重传，这样可能导致每次连接传送的数据量增大。另一方面，在服务器不需要先前信息时它的应答就较快。
 ```
 
 Cookie 是**服务器**发送到**用户浏览器**并保存在本地的一小块数据，它会在浏览器之后向同一服务器再次发起请求时被**携带**上，用于告知服务端两个请求是否来自同一浏览器。由于之后**每次请求都会需要携带** Cookie 数据，因此会带来额外的性能开销（尤其是在移动环境下）。
@@ -1126,20 +1126,20 @@ DELETE /idX/delete HTTP/1.1   -> Returns 404
 
 > **就下面的找几个点和面试官侃侃而谈即可，不可能全部都记得，想到什么讲什么吧**
 
-- GET 被强制服务器支持 
+- GET 被强制服务器支持
 - 浏览器对URL的长度有限制，所以GET请求不能代替POST请求发送大量数据
-- GET请求发送数据更小 
+- GET请求发送数据更小
 - GET请求是不安全的
-- GET请求是幂等的 
+- GET请求是幂等的
     - 幂等的意味着对同一URL的多个请求应该返回同样的结果
-- POST请求不能被缓存 
-- POST请求相对GET请求是「安全」的 
+- POST请求不能被缓存
+- POST请求相对GET请求是「安全」的
     - 这里安全的含义仅仅是指是非修改信息
 - GET用于信息获取，而且是安全的和幂等的
     - 所谓安全的意味着该操作用于获取信息而非修改信息。换句话说，GET 请求一般不应产生副作用。就是说，它仅仅是获取资源信息，就像数据库查询一样，不会修改，增加数据，不会影响资源的状态。
 
 - POST是用于修改服务器上的资源的请求
-- 发送包含未知字符的用户输入时，POST 比 GET 更稳定也更可靠 
+- 发送包含未知字符的用户输入时，POST 比 GET 更稳定也更可靠
 
 
 
@@ -1148,7 +1148,7 @@ DELETE /idX/delete HTTP/1.1   -> Returns 404
 - GET是从服务器上获取数据，POST是向服务器传送数据。 GET和 POST只是一种传递数据的方式，GET也可以把数据传到服务器，他们的本质都是发送请求和接收结果。只是组织格式和数据量上面有差别，http协议里面有介绍
 - GET是把参数数据队列加到提交表单的ACTION属性所指的URL中，值和表单内各个字段一一对应，在URL中可以看到。POST是通过HTTP POST机制，将表单内各个字段与其内容放置在HTML HEADER内一起传送到ACTION属性所指的URL地址。用户看不到这个过程。 因为GET设计成传输小数据，而且最好是不修改服务器的数据，所以浏览器一般都在地址栏里面可以看到，但POST一般都用来传递大数据，或比较隐私的数据，所以在地址栏看不到，能不能看到不是协议规定，是浏览器规定的。
 - 对于GET方式，服务器端用Request.QueryString获取变量的值，对于POST方式，服务器端用Request.Form获取提交的数据。 没明白，怎么获得变量和你的服务器有关，和GET或POST无关，服务器都对这些请求做了封装  
-- GET传送的数据量较小，不能大于2KB。POST传送的数据量较大，一般被默认为不受限制。但理论上，IIS4中最大量为80KB，IIS5中为100KB。 POST基本没有限制，我想大家都上传过文件，都是用POST方式的。只不过要修改form里面的那个type参数 
+- GET传送的数据量较小，不能大于2KB。POST传送的数据量较大，一般被默认为不受限制。但理论上，IIS4中最大量为80KB，IIS5中为100KB。 POST基本没有限制，我想大家都上传过文件，都是用POST方式的。只不过要修改form里面的那个type参数
 - GET安全性非常低，POST安全性较高。 如果没有加密，他们安全级别都是一样的，随便一个监听器都可以把所有的数据监听到。
 
 
