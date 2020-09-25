@@ -1,7 +1,8 @@
 ## UML类图相关
 
 ### 1.类图基本属性
-![类图的表示][https://upload-images.jianshu.io/upload_images/5336514-d05e8edc42eb1469.png?imageMogr2/auto-orient/strip|imageView2/2/w/512/format/webp]
+<img src="C:\Users\wbt\Desktop\faceToWork\notes\UML.assets\5336514-d05e8edc42eb1469.png" alt="img" style="zoom:50%;" />
+
 ```
 -表示private  
 #表示protected
@@ -24,7 +25,7 @@ _下划线表示static
 继承表示是一个类（称为子类、子接口）继承另外的一个类（称为父类、父接口）的功能，并可以增加它自己的新功能的能力。
 ###### 表示方法：
 继承使用空心三角形+实线表示。
-![继承][https://upload-images.jianshu.io/upload_images/5336514-dc3ac9dd64968b59.png?imageMogr2/auto-orient/strip|imageView2/2/w/231/format/webp]
+![img](C:\Users\wbt\Desktop\faceToWork\notes\UML.assets\5336514-dc3ac9dd64968b59.png)
 
 #### 2.2实现
 ###### 介绍
@@ -32,10 +33,11 @@ _下划线表示static
 ###### 表示方法
 ###### 1）矩形表示法
 使用空心三角形+虚线表示
-![矩形表示法][https://upload-images.jianshu.io/upload_images/5336514-2941b3300988ffe9.png?imageMogr2/auto-orient/strip|imageView2/2/w/314/format/webp]
+![img](C:\Users\wbt\Desktop\faceToWork\notes\UML.assets\5336514-2941b3300988ffe9.png)
+
 ###### 2）棒棒糖表示法
 使用实线表示
-![实线表示法][https://upload-images.jianshu.io/upload_images/5336514-ad59831e8065522a.png?imageMogr2/auto-orient/strip|imageView2/2/w/313/format/webp]
+![img](C:\Users\wbt\Desktop\faceToWork\notes\UML.assets\5336514-ad59831e8065522a.png)
 
 #### 2.3依赖
 ###### 介绍
@@ -44,7 +46,7 @@ _下划线表示static
 依赖关系用虚线箭头表示。
 ###### 示例：
 动物依赖氧气和水。调用新陈代谢方法需要氧气类与水类的实例作为参数
-![依赖关系][https://upload-images.jianshu.io/upload_images/5336514-823083d2d77916ae.png?imageMogr2/auto-orient/strip|imageView2/2/w/414/format/webp]
+![img](C:\Users\wbt\Desktop\faceToWork\notes\UML.assets\5336514-823083d2d77916ae.png)
 
 #### 2.4关联
 ###### 介绍
@@ -62,7 +64,7 @@ _下划线表示static
 聚合关系用空心的菱形+实线箭头表示。
 ###### 示例：
 每一只大雁都属于一个大雁群，一个大雁群可以有多只大雁。当大雁死去后大雁群并不会消失，两个对象生命周期不同。
-![聚合][https://upload-images.jianshu.io/upload_images/5336514-e63191f4e23f2ad9.png?imageMogr2/auto-orient/strip|imageView2/2/w/297/format/webp]
+![img](C:\Users\wbt\Desktop\faceToWork\notes\UML.assets\5336514-e63191f4e23f2ad9.png)
 
 #### 2.6组合
 ###### 介绍：
@@ -71,4 +73,4 @@ _下划线表示static
 组合关系用实心的菱形+实线箭头表示，还可以使用连线两端的数字表示某一端有几个实例。
 ###### 示例：
 鸟和翅膀就是组合关系，因为它们是部分和整体的关系，并且翅膀和鸟的生命周期是相同的。
-![组合][https://upload-images.jianshu.io/upload_images/5336514-dfb604bd1c4408d5.png?imageMogr2/auto-orient/strip|imageView2/2/w/365/format/webp]
+![img](C:\Users\wbt\Desktop\faceToWork\notes\UML.assets\5336514-dfb604bd1c4408d5.png)
