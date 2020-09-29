@@ -11,5 +11,4 @@
 * [ ] Linux相关
 * [x] TCP/IP&Http
 * [x] Docker
-* [ ] k8s
 * [ ] Elasticsearch
