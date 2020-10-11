@@ -46,39 +46,24 @@ target == arr[mid]  // 说明找到就返回
 
 代码如下：
 
-```java
-/**
- * 二分查找算法 递归实现
- *
- * @param array      数组
- * @param left  左边的索引
- * @param right 右边的索引
- * @param target     要查找的值
- * @return 如果找到就返回下标，如果没有找到就返回 -1
- */
-public static int binarySearch(int[] array, int left, int right, int target) {
-	// Base case
-	if (array == null || array.length == 0) return -1;
+```go
+func bsearch(start int, end int, nums[]int, target int) int{
+    if start > end {
+        return -1
+    }
+    mid := (start + end) / 2
+    if nums[mid] == target {
+        return mid
+    } 
+    if nums[mid] < target {
+        return bsearch(mid + 1, end, nums, target)
+    } else {
+        return bsearch(start, mid -1 , nums, target)
+    }
 
-	// 当left >right 时，说明已经递归整个数组，但是没有找到
-	if (left > right) {
-		return -1;
-	}
-
-	// 找中间索引与值
-	int mid = left + (right - left) / 2;
-	int midValue = array[mid];
-
-	// 向右递归
-	if (target > midValue) {
-		return binarySearch(array, mid + 1, right, target);
-		// 向左递归
-	} else if (target < midValue) {
-		return binarySearch(array, left, mid - 1, target);
-	} else {
-		// 等于时直接返回
-		return mid;
-	}
+}
+func search(nums []int, target int) int {
+    return bsearch(0, len(nums)-1, nums, target)
 }
 ```
 
@@ -86,33 +71,26 @@ public static int binarySearch(int[] array, int left, int right, int target) {
 
 也可**迭代**实现二分查找。注意结束迭代的条件就是 **leftIndex <= rightIndex** 。
 
-```java
-/**
- * 二分查找的非递归实现
- *
- * @param array  待查找的数组, arr是升序排序
- * @param target 需要查找的数
- * @return 返回对应下标，-1表示没有找到
- */
-public static int binarySearch(int[] array, int target) {
-	// 左右索引值
-	int left = 0;
-	int right = array.length - 1;
-	// 说明继续查找
-	while (left <= right) {
-		int mid = left + (right - left) / 2;
-		if (array[mid] == target) {
-			return mid;
-		} else if (array[mid] > target) {
-			// 需要向左边查找
-			right = mid - 1;
-		} else {
-			// 需要向右边查找
-			left = mid + 1;
-		}
-	}
-	// Not find
-	return -1;
+```go
+func search(nums []int, target int) int {
+    if nums == nil{
+        return -1
+    }
+
+    start := 0
+    end := len(nums) - 1
+
+    for start <= end {
+        mid := (end + start) / 2
+        if nums[mid] == target {
+            return mid
+        } else if nums[mid] < target {
+            start = mid + 1
+        } else {
+            end = mid - 1
+        }
+    }
+    return -1
 }
 ```
 
@@ -124,7 +102,7 @@ public static int binarySearch(int[] array, int target) {
 
 二分查找中计算 mid 索引的公式：
 
-```java
+```go
 int mid = (left + right) / 2;
 ```
 
@@ -150,7 +128,7 @@ int mid = 0 + (99 - 0) * (1 - 1)/ (100 - 1) = 0 + 99 * 0 / 99 = 0
 int mid = 0 + (99 - 0) * (100 - 1) / (100 - 1) = 0 + 99 * 99 / 99 = 0 + 99 = 99 
 ```
 
-```java
+```go
 /**
  * 插指查找算法
  *
@@ -161,9 +139,8 @@ int mid = 0 + (99 - 0) * (100 - 1) / (100 - 1) = 0 + 99 * 99 / 99 = 0 + 99 = 99
  * @param target 查找值
  * @return 如果找到，就返回对应的下标，如果没有找到返回-1
  */
-public static int insertValueSearch(int[] array, int left, int right, int target) {
-
-	System.out.println("插值查找被调用1次");
+func insertValueSearch(array int[], left int, right int, target int) {
+	fmt.println("插值查找被调用1次");
 
 	// 后面两个条件必须要，否则我们得到的 mid 可能越界（比如findValue值特别巨大，而findValue参与到了mid值的计算中）
 	// 同时如果待查找的值比最小值小或比最大值还大，直接返回-1
@@ -172,8 +149,8 @@ public static int insertValueSearch(int[] array, int left, int right, int target
 	}
 
 	// 使用自适应公式计算 mid 索引值
-	int mid = left + (right - left) * (target - array[left]) / (array[right] - array[left]);
-	int midValue = array[mid];
+    mid := left + (right - left) * (target - array[left]) / (array[right] - array[left]);
+    midValue := array[mid];
 	if (target > midValue) {
 		// 说明应该向右边递归
 		return insertValueSearch(array, mid + 1, right, target);
@@ -224,25 +201,15 @@ mid = low + F(k-1) - 1
 类似的，每一子段也可以用相同的方式分割。
 但顺序表长度 n **不一定刚好等于** F[k] - 1，所以需要将原来的顺序表长度 n **扩容增加**至 F[k] - 1。这里的 k 值只要能使得 F[k] - 1恰好大于或等于 n 即可, 顺序表长度增加后，新增的位置（从n+1到F[k]-1位置），都赋为 n 位置的值即可。
 
-```java
-/**
- * 裴波那契算法
- * @author cz
- */
-public class FibonacciSearch {
+```go
 
-    public static int maxSize = 20;
-    public static void main(String[] args) {
-        int [] arr = {1, 8, 10, 89, 1000, 1234};
-        System.out.println("index = " + fibonacciSearch(arr, 89));
-    }
 
     /**
      * 因为后面我们 mid = low+F(k-1)-1 需要使用到斐波那契数列，因此我们需要先获取到一个斐波那契数列
      * 此处使用非递归方法得到一个斐波那契数列
      * @return 斐波那契数列
      */
-    public static int[] getFibonacciArray() {
+    func getFibonacciArray() []int{
         int[] fibo = new int[maxSize];
         fibo[0] = 1;
         fibo[1] = 1;
@@ -251,6 +218,14 @@ public class FibonacciSearch {
         }
         return fibo;
     }
+
+/**
+ * 裴波那契算法
+ */
+func FibonacciSearch {
+    maxSize := 20;
+    var arr int[] = {1, 8, 10, 89, 1000, 1234};
+    fmt.println("index = " + fibonacciSearch(arr, 89));
 
     /**
      * 斐波那契查找算法 非递归方式实现
@@ -425,15 +400,16 @@ Explanation: The square root of 8 is 2.82842..., and since we want to return an 
 
 对于 x = 8，它的开方是 2.82842...，最后应该返回 2 而不是 3。在循环条件为 l <= h 并且循环退出时，h 总是比 l 小 1，也就是说 h = 2，l = 3，因此最后的返回值应该为 h 而不是 l。
 
-```java
-public int mySqrt(int x) {
+```go
+func mySqrt(x int) {
     if (x <= 1) {
         return x;
     }
-    int l = 1, h = x;
+    l := 1
+    h := x
     while (l <= h) {
-        int mid = l + (h - l) / 2;
-        int sqrt = x / mid;
+        mid := l + (h - l) / 2;
+        sqrt := x / mid;
         if (sqrt == mid) {
             return mid;
         } else if (mid > sqrt) {
@@ -464,12 +440,12 @@ Output: "c"
 
 题目描述：给定一个有序的字符数组 letters 和一个字符 target，要求找出 letters 中大于 target 的最小字符，如果找不到就返回第 1 个字符。
 
-```java
-public char nextGreatestLetter(char[] letters, char target) {
-    int n = letters.length;
-    int l = 0, h = n - 1;
+```go
+func nextGreatestLetter(letters []char,  target char) {
+    n := letters.length;
+    l := 0, h = n - 1;
     while (l <= h) {
-        int m = l + (h - l) / 2;
+        m := l + (h - l) / 2;
         if (letters[m] <= target) {
             l = m + 1;
         } else {
