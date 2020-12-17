@@ -1,31 +1,10 @@
-<!-- TOC -->
+[toc]
 
-- [一文搞懂 RabbitMQ 的重要概念以及安装](#一文搞懂-rabbitmq-的重要概念以及安装)
-    - [一 RabbitMQ 介绍](#一-rabbitmq-介绍)
-        - [1.1 RabbitMQ 简介](#11-rabbitmq-简介)
-        - [1.2 RabbitMQ 核心概念](#12-rabbitmq-核心概念)
-            - [1.2.1 Producer(生产者) 和 Consumer(消费者)](#121-producer生产者-和-consumer消费者)
-            - [1.2.2 Exchange(交换器)](#122-exchange交换器)
-            - [1.2.3 Queue(消息队列)](#123-queue消息队列)
-            - [1.2.4 Broker（消息中间件的服务节点）](#124-broker消息中间件的服务节点)
-            - [1.2.5 Exchange Types(交换器类型)](#125-exchange-types交换器类型)
-                - [① fanout](#①-fanout)
-                - [② direct](#②-direct)
-                - [③ topic](#③-topic)
-                - [④ headers(不推荐)](#④-headers不推荐)
-    - [二 安装 RabbitMq](#二-安装-rabbitmq)
-        - [2.1 安装 erlang](#21-安装-erlang)
-        - [2.2 安装 RabbitMQ](#22-安装-rabbitmq)
 
-<!-- /TOC -->
 
-# 一文搞懂 RabbitMQ 的重要概念以及安装
+#### 一 RabbitMQ 介绍
 
-## 一 RabbitMQ 介绍
-
-这部分参考了 《RabbitMQ实战指南》这本书的第 1 章和第 2 章。
-
-### 1.1 RabbitMQ 简介
+##### 1.1 RabbitMQ 简介
 
 RabbitMQ 是采用 Erlang 语言实现 AMQP(Advanced Message Queuing Protocol，高级消息队列协议）的消息中间件，它最初起源于金融系统，用于在分布式系统中存储转发消息。
 
@@ -40,7 +19,7 @@ RabbitMQ 发展到今天，被越来越多的人认可，这和它在易用性�
 - **易用的管理界面：** RabbitMQ提供了一个易用的用户界面，使得用户可以监控和管理消息、集群中的节点等。在安装 RabbitMQ 的时候会介绍到，安装好 RabbitMQ 就自带管理界面。
 - **插件机制：** RabbitMQ 提供了许多插件，以实现从多方面进行扩展，当然也可以编写自己的插件。感觉这个有点类似 Dubbo 的 SPI机制。
 
-### 1.2 RabbitMQ 核心概念
+##### 1.2 RabbitMQ 核心概念
 
 RabbitMQ 整体上是一个生产者与消费者模型，主要负责接收、存储和转发消息。可以把消息传递的过程想象成：当你将一个包裹送到邮局，邮局会暂存并最终将邮件通过邮递员送到收件人的手上，RabbitMQ就好比由邮局、邮箱和邮递员组成的一个系统。从计算机术语层面来说，RabbitMQ 模型更像是一种交换机模型。
 
@@ -50,14 +29,14 @@ RabbitMQ 整体上是一个生产者与消费者模型，主要负责接收、�
 
 下面我会一一介绍上图中的一些概念。
 
-#### 1.2.1 Producer(生产者) 和 Consumer(消费者)
+###### 1.2.1 Producer(生产者) 和 Consumer(消费者)
 
 - **Producer(生产者)** :生产消息的一方（邮件投递者）
 - **Consumer(消费者)** :消费消息的一方（邮件收件人）
 
-消息一般由 2 部分组成：**消息头**（或者说是标签 Label）和 **消息体**。消息体也可以称为 payLoad ,消息体是不透明的，而消息头则由一系列的可选属性组成，这些属性包括 routing-key（路由键）、priority（相对于其他消息的优先权）、delivery-mode（指出该消息可能需要持久性存储）等。生产者把消息交由 RabbitMQ 后，RabbitMQ 会根据消息头把消息发送给感兴趣的 Consumer(消费者)。
+消息一般由 2 部分组成：**消息头**（或者说是标签 Label）和 **消息体**。消息体也可以称为 payLoad ,消息体是**不透明**的，而消息头则由一系列的可选属性组成，这些属性包括 routing-key（路由键）、priority（相对于其他消息的优先权）、delivery-mode（指出该消息可能需要持久性存储）等。生产者把消息交由 RabbitMQ 后，RabbitMQ 会根据消息头把消息发送给感兴趣的 Consumer(消费者)。
 
-#### 1.2.2 Exchange(交换器)
+###### 1.2.2 Exchange(交换器)
 
 在 RabbitMQ 中，消息并不是直接被投递到 **Queue(消息队列)** 中的，中间还必须经过 **Exchange(交换器)** 这一层，**Exchange(交换器)** 会把我们的消息分配到对应的 **Queue(消息队列)** 中。
 
@@ -71,7 +50,7 @@ Exchange(交换器) 示意图如下：
 
 生产者将消息发给交换器的时候，一般会指定一个 **RoutingKey(路由键)**，用来指定这个消息的路由规则，而这个 **RoutingKey 需要与交换器类型和绑定键(BindingKey)联合使用才能最终生效**。
 
-RabbitMQ 中通过 **Binding(绑定)** 将 **Exchange(交换器)** 与 **Queue(消息队列)** 关联起来，在绑定的时候一般会指定一个 **BindingKey(绑定建)** ,这样 RabbitMQ 就知道如何正确将消息路由到队列了,如下图所示。一个绑定就是基于路由键将交换器和消息队列连接起来的路由规则，所以可以将交换器理解成一个由绑定构成的路由表。Exchange 和 Queue 的绑定可以是多对多的关系。
+RabbitMQ 中通过 **Binding(绑定)** 将 **Exchange(交换器)** 与 **Queue(消息队列)** 关联起来，在绑定的时候一般会指定一个 **BindingKey(绑定键)** ,这样 RabbitMQ 就知道如何正确将消息路由到队列了,如下图所示。一个绑定就是基于路由键将交换器和消息队列连接起来的路由规则，所以可以将交换器理解成一个由绑定构成的路由表。Exchange 和 Queue 的绑定可以是多对多的关系。
 
 Binding(绑定) 示意图：
 
@@ -79,17 +58,17 @@ Binding(绑定) 示意图：
 
 生产者将消息发送给交换器时，需要一个RoutingKey,当 BindingKey 和 RoutingKey 相匹配时，消息会被路由到对应的队列中。在绑定多个队列到同一个交换器的时候，这些绑定允许使用相同的 BindingKey。BindingKey 并不是在所有的情况下都生效，它依赖于交换器类型，比如fanout类型的交换器就会无视，而是将消息路由到所有绑定到该交换器的队列中。
 
-#### 1.2.3 Queue(消息队列)
+###### 1.2.3 Queue(消息队列)
 
 **Queue(消息队列)** 用来保存消息直到发送给消费者。它是消息的容器，也是消息的终点。一个消息可投入一个或多个队列。消息一直在队列里面，等待消费者连接到这个队列将其取走。
 
 **RabbitMQ** 中消息只能存储在 **队列** 中，这一点和 **Kafka** 这种消息中间件相反。Kafka 将消息存储在 **topic（主题）** 这个逻辑层面，而相对应的队列逻辑只是topic实际存储文件中的位移标识。 RabbitMQ 的生产者生产消息并最终投递到队列中，消费者可以从队列中获取消息并消费。
 
-**多个消费者可以订阅同一个队列**，这时队列中的消息会被平均分摊（Round-Robin，即轮询）给多个消费者进行处理，而不是每个消费者都收到所有的消息并处理，这样避免的消息被重复消费。
+**多个消费者可以订阅同一个队列**，这时队列中的消息会被**平均分摊**（Round-Robin，即轮询）给多个消费者进行处理，而不是每个消费者都收到所有的消息并处理，这样避免的消息被重复消费。
 
 **RabbitMQ** 不支持队列层面的广播消费,如果有广播消费的需求，需要在其上进行二次开发,这样会很麻烦，不建议这样做。
 
-#### 1.2.4 Broker（消息中间件的服务节点）
+###### 1.2.4 Broker（消息中间件的服务节点）
 
 对于 RabbitMQ 来说，一个 RabbitMQ Broker 可以简单地看作一个 RabbitMQ 服务节点，或者RabbitMQ服务实例。大多数情况下也可以将一个 RabbitMQ Broker 看作一台 RabbitMQ 服务器。
 
@@ -99,23 +78,23 @@ Binding(绑定) 示意图：
 
 这样图1中的一些关于 RabbitMQ 的基本概念我们就介绍完毕了，下面再来介绍一下 **Exchange Types(交换器类型)** 。
 
-#### 1.2.5 Exchange Types(交换器类型)
+###### 1.2.5 Exchange Types(交换器类型)
 
 RabbitMQ 常用的 Exchange Type 有 **fanout**、**direct**、**topic**、**headers** 这四种（AMQP规范里还提到两种 Exchange Type，分别为 system 与 自定义，这里不予以描述）。
 
 ##### ① fanout
 
-fanout 类型的Exchange路由规则非常简单，它会把所有发送到该Exchange的消息路由到所有与它绑定的Queue中，不需要做任何判断操作，所以 fanout 类型是所有的交换机类型里面速度最快的。fanout 类型常用来广播消息。
+fanout 类型的Exchange路由规则非常简单，它会把所有发送到该Exchange的消息路由到**所有**与它绑定的Queue中，不需要做任何判断操作，所以 fanout 类型是所有的交换机类型里面速度最快的。fanout 类型常用来**广播**消息。
 
 ##### ② direct
 
-direct 类型的Exchange路由规则也很简单，它会把消息路由到那些 Bindingkey 与 RoutingKey 完全匹配的 Queue 中。 
+direct 类型的Exchange路由规则也很简单，它会把消息路由到那些 Bindingkey 与 RoutingKey **完全匹配**的 Queue 中。 
 
 ![direct 类型交换器](assets/37008021.jpg)
 
 以上图为例，如果发送消息的时候设置路由键为“warning”,那么消息会路由到 Queue1 和 Queue2。如果在发送消息的时候设置路由键为"Info”或者"debug”，消息只会路由到Queue2。如果以其他的路由键发送消息，则消息不会路由到这两个队列中。
 
-direct 类型常用在处理有优先级的任务，根据任务的优先级把消息发送到对应的队列，这样可以指派更多的资源去处理高优先级的队列。
+direct 类型常用在处理有优先级的任务，**根据任务的优先级把消息发送到对应的队列**，这样可以指派更多的资源去处理高优先级的队列。
 
 ##### ③ topic
 
@@ -137,9 +116,9 @@ direct 类型常用在处理有优先级的任务，根据任务的优先级把�
 
 ##### ④ headers(不推荐)
 
-headers 类型的交换器不依赖于路由键的匹配规则来路由消息，而是根据发送的消息内容中的 headers 属性进行匹配。在绑定队列和交换器时制定一组键值对，当发送消息到交换器时，RabbitMQ会获取到该消息的 headers（也是一个键值对的形式)'对比其中的键值对是否完全匹配队列和交换器绑定时指定的键值对，如果完全匹配则消息会路由到该队列，否则不会路由到该队列。headers 类型的交换器性能会很差，而且也不实用，基本上不会看到它的存在。
+headers 类型的交换器不依赖于路由键的匹配规则来路由消息，而是**根据发送的消息内容中的 headers 属性进行匹配**。在绑定队列和交换器时制定一组键值对，当发送消息到交换器时，RabbitMQ会获取到该消息的 headers（也是一个键值对的形式)'对比其中的键值对是否完全匹配队列和交换器绑定时指定的键值对，如果完全匹配则消息会路由到该队列，否则不会路由到该队列。headers 类型的交换器性能会很差，而且也不实用，基本上不会看到它的存在。
 
-## 二 安装 RabbitMq
+#### 二 安装 RabbitMq
 
 通过 Docker 安装非常方便，只需要几条命令就好了，我这里是只说一下常规安装方法。
 
@@ -149,7 +128,7 @@ headers 类型的交换器不依赖于路由键的匹配规则来路由消息，
 
 ![RabbitMQ 和 Erlang 的版本关系](assets/RabbitMQ-Erlang.png)
 
-### 2.1 安装 erlang
+##### 2.1 安装 erlang
 
 **1 下载 erlang 安装包**
 
@@ -244,7 +223,7 @@ export ERL_HOME PATH
 
 ![输入 erl 查看 erlang 环境变量是否配置正确](assets/62504246.jpg)
 
-### 2.2 安装 RabbitMQ
+##### 2.2 安装 RabbitMQ
 
 **1. 下载rpm** 
 

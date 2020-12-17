@@ -400,7 +400,7 @@ SELECT ... FOR UPDATE;
 **InnoDB 存储引擎的锁的算法有三种：**
 
 - Record lock：单个行记录上的锁。
-- Gap lock：间隙锁，锁定一个范围，不包括记录本身。
+- Gap lock：**间隙锁**，锁定一个**范围，不包括记录本身**。
 - Next-key lock：record+gap 锁定一个范围，包含记录本身。
 
 **相关知识点：**
