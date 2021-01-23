@@ -1,4 +1,6 @@
-> 本文由 JavaGuide 读者推荐，JavaGuide 对文章进行了整理排版！原文地址：https://www.wmyskxz.com/2019/07/17/kafka-ru-men-jiu-zhe-yi-pian/ ， 作者：我没有三颗心脏。
+[toc]
+
+
 
 # 一、Kafka 简介
 
