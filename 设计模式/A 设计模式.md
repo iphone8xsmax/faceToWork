@@ -513,11 +513,11 @@ func (this *SubOperate)Operate(rhs int, lhs int) int {
 //工厂类
 type OperateFactory struct {
 }
-
+//返回一个实例
 func NewOperateFactory()  *OperateFactory {
     return &OperateFactory{}
 }
-
+//工厂类的运算方法，返回一个接口
 func (this *OperateFactory)CreateOperate(operatename string) Operater {
     switch   operatename {
         case "+":
@@ -862,7 +862,7 @@ User(String name, int age, String address, int cardID);
 
 **何时使用：**
 
-一些基本部件不会变，而其组合经常变化的时候。
+一些基本部件不会变，而其组合经常变化的时候。 
 
 **如何解决：将变与不变分离开。**
 
