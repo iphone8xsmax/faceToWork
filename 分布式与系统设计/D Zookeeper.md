@@ -510,7 +510,7 @@ Zookeeper 集群的目的是为了保证系统的性能承载更多的客户端�
 
 ##### 1. 集群角色
 
-Zookeeper 集群没有选择传统的  Master/Slave 概念，而是总共有**三种角色**，分别是 **leader（主节点）follower(子节点) observer（次级子节点）**。
+Zookeeper 集群**没有选择传统的  Master/Slave 概念**，而是总共有**三种角色**，分别是 **leader（主节点）follower(子节点) observer（次级子节点）**。
 
 <img src="assets/89602762.jpg" style="zoom:85%;" />
 
@@ -522,11 +522,11 @@ Zookeeper 集群没有选择传统的  Master/Slave 概念，而是总共有**�
 | **follower** | **子节点**，又名**追随者**。用于实现**数据的读取**。同时他也是主节点的**备选**节点，并用拥有**投票权**。 |
 | **observer** | **次级子节点**，又名**观察者**。可以实现**读取数据**，与 fllower 区别在于**没有投票权**，**不能选为主节点**。并且在计算集群**可用状态时不会**将 observer 计算入内。 |
 
-ZooKeeper 集群中的所有机器通过一个 **Leader** 选举过程来选定一台称为 "Leader" 的机器，Leader 既可以为客户端提供写服务又能提供读服务。除了 Leader 外，Follower 和  Observer 都只能提供读服务。Follower 和  Observer 唯一的区别在于 Observer 机器不参与 Leader 的选举过程，也不参与写操作的“过半写成功”策略，因此 Observer 机器可以在不影响写性能的情况下提升集群的读性能。
+ZooKeeper 集群中的所有机器通过一个 **Leader** 选举过程来选定一台称为 "Leader" 的机器，Leader 既可以为客户端提供写服务又能提供读服务。除了 Leader 外，Follower 和  Observer 都只能提供读服务。Follower 和  Observer 唯一的区别在于 Observer 机器不参与 Leader 的选举过程，也不参与写操作的“**过半写成功**”策略，因此 Observer 机器可以在不影响写性能的情况下提升集群的读性能。
 
 可以看到这就是一种**读写分离**的架构。
 
-**observer配置：**只要在集群配置中加上 observer 后缀即可，示例如下：
+**observer 配置：**只要在集群配置中加上 observer 后缀即可，示例如下：
 
 ```bash
 server.3=127.0.0.1:2889:3889:observer
@@ -674,20 +674,20 @@ Mode: leader
 Mode: follower
 ```
 
-可以发现中间的 2182 是 **leader** 状态。其选举机制如下图：
+可以发现中间的 **2182** 是 **leader** 状态。其选举机制如下图：
 
 <img src="assets/ChMbWt0DhF4NL7nA.png!thumbnail" alt="图片" style="zoom: 56%;" />
 
 **投票机制说明：**
 
-- 第一轮投票全部投给**自己**。
-- 第二轮投票给 **myid** 比自己**大的**相邻节点。
+- **第一轮投票**全部投给**自己**。
+- **第二轮投票**给 **myid** 比自己**大的**相邻节点。
 - 如果得票**超过半数，选举结束**。
 
 **选举触发：**当集群中的服务器出现已下两种情况时会进行 Leader 的选举。
 
 1. 服务节点**初始化启动**。
-2. **半数以上**的节点无法和 Leader 建立连接。
+2. **半数以上**的节点**无法和 Leader 建立连接**。
 
 **当节点初始起动时**会在集群中寻找 Leader 节点，如果找到则与 Leader 建立连接，其自身状态变化 **follower** 或**observer。**如果没有找到 Leader，当前节点状态将变化 **LOOKING**，进入选举流程。
 
@@ -701,7 +701,7 @@ Mode: follower
 
 接着 **server2 启动**了，它首先也会将投票选给**自己**(2, 0)，并将投票信息**广播出去**（server1也会，只是它那时没有其他的服务器了），server1 在收到 server2 的投票信息后**会将投票信息与自己的作比较**。首先它会比较 ZXID ，ZXID 大的优先为 Leader，如果相同则比较 myid，**myid 大的优先作为 Leader**。所以此时server1 发现 server2 更适合做 Leader，它就会将自己的投票信息更改为 (2, 0) 然后再广播出去，之后 server2  收到之后发现和自己的一样无需做更改，并且自己的 投票**已经超过半数** ，则确定 **server2 为 Leader**，server1 也会将自己服务器设置为 Following 变为 Follower。整个服务器就从 Looking 变为了正常状态。
 
-当 **server3 启动**发现集群没有处于 Looking 状态时，它会**直接以 Follower 的身份**加入集群。
+当 **server3 启动**发现集群没有处于 **Looking** 状态时，它会**直接以 Follower 的身份**加入集群。
 
 (2) 再来介绍 leader 宕机是如何进行选举的。
 
@@ -787,7 +787,7 @@ echo stat | nc localhost 2181
 
 ##### 1. 概述
 
-Paxos 算法应该可以说是  ZooKeeper 的灵魂了。但是 ZooKeeper 并**没有完全采用 Paxos算法** ，而是**使用 ZAB 协议**作为其保证数据一致性的核心算法。另外，在 ZooKeeper 的官方文档中也指出，ZAB 协议并不像 Paxos 算法那样，是一种通用的分布式一致性算法，它是一种**特别为 Zookeeper 设计的崩溃可恢复的原子消息广播算法**。
+**Paxos 算法**应该可以说是  ZooKeeper 的灵魂了。但是 ZooKeeper 并**没有完全采用 Paxos算法** ，而是**使用 ZAB 协议**作为其**保证数据一致性的核心算法**。ZAB 协议并不像 Paxos 算法那样，是一种通用的分布式一致性算法，它是一种**特别为 Zookeeper 设计的崩溃可恢复的原子消息广播算法**。
 
 ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为 ZooKeeper **专门设计**的一种**支持崩溃恢复的原子广播协议**。 在 ZooKeeper 中，主要**依赖 ZAB 协议来实现分布式数据一致性**，基于该协议，ZooKeeper 实现了一种**主备模式**的系统架构来保持集群中各个副本之间的数据一致性。
 
@@ -801,15 +801,13 @@ ZAB 中三个主要的角色，**Leader 领导者、Follower 跟随者、Observe
 
 ##### 3. ZAB协议的两种基本模式
 
-ZAB 协议包括两种基本的模式，分别是**崩溃恢复和消息广播**。
+ZAB 协议包括**两种基本**的模式，分别是**崩溃恢复和消息广播**。
 
 ###### (1) 消息广播模式
 
 只有 Leader 能处理写请求，Follower 和 Observer 也需要同步更新数据，需要 **Leader 将写请求 广播 出去**，让 Leader 问问 **Followers 是否同意更新**，如果超过**半数以上的同意**那么就进行 **Follower 和 Observer 的更新**（和 Paxos 一样）。
 
 <img src="assets/image-20200726210017478.png" alt="image-20200726210017478" style="zoom:70%;" />
-
-
 
 这两个 Queue 哪冒出来的？答案是 **ZAB 需要让 Follower 和 Observer 保证顺序性**。何为顺序性，比如现在有一个写请求 A，此时 Leader 将请求 **A 广播**出去，因为只需要**半数同意**就行，所以可能这个时候有一个 Follower F1 因为网络原因**没有收到**，而 Leader 又广播了一个请求 B，因为网络原因，F1 竟然**先收到了请求 B 然后才收到了请求 A**，这个时候请求处理的顺序不同就会导致数据的不同，从而产生数据不一致问题 。所以在 **Leader 这端**，它为每个其他的 zkServer 准备了一个 **队列** ，采用**先进先出**的方式发送消息。由于协议是 通过 **TCP 来进行网络通信**的，保证了消息的**发送顺序性，接受顺序性也得到了保证**。
 
@@ -1199,7 +1197,7 @@ public class Client {
 
 * **获得写锁**流程：
 
-1、基于资源 ID 创建临时序号**写锁节点** 
+1、基于资源 ID 创建临时序号**写锁节点**。
 
 ```bash
 /lock/888.R0000000002 Write 
