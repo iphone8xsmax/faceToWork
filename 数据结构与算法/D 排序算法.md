@@ -306,24 +306,29 @@ n/2, (n/2)/2, ..., 1
 
 ```go
 func shellSort(arr []int) []int {
-        length := len(arr)
-        gap := 1
-        for gap < gap/3 {
-                gap = gap*3 + 1
-        }
-        for gap > 0 {
-                for i := gap; i < length; i++ {
-                        temp := arr[i]
-                        j := i - gap
-                        for j >= 0 && arr[j] > temp {
-                                arr[j+gap] = arr[j]
-                                j -= gap
-                        }
-                        arr[j+gap] = temp
-                }
-                gap = gap / 3
-        }
-        return arr
+	length := len(arr)
+	gap := 1
+	for gap < length/3 {//寻找合适的间隔gap
+		gap = gap*3 + 1
+	}
+	for gap >= 1 {
+		//将数组变为间隔h个元素有序
+		for i := gap; i < length; i++ {
+			//原方案交换排序
+			//for j := i; j >= gap && arr[j] < arr[j - gap]; j -= gap{
+			//   arr[j], arr[j - gap] = arr[j - gap], arr[j]
+			//}
+			temp := arr[i]
+			j := i - gap
+			for j >= 0 && arr[j] > temp {
+				arr[j+gap] = arr[j]
+				j -= gap
+			}
+			arr[j+gap] = temp
+		}
+		gap = gap / 3
+	}
+	return arr
 }
 ```
 
@@ -442,34 +447,132 @@ pivot = left + (int) (Math.random() * (right - left + 1))
 
 ```go
 func quickSort(arr []int) []int {
-        return _quickSort(arr, 0, len(arr)-1)
+	return _quicksort(arr, 0, len(arr) - 1)
 }
 
-func _quickSort(arr []int, left, right int) []int {
-        if left < right {
-                partitionIndex := partition(arr, left, right)
-                _quickSort(arr, left, partitionIndex-1)
-                _quickSort(arr, partitionIndex+1, right)
-        }
-        return arr
+func _quicksort(arr []int, left, right int) []int {
+	if left < right{
+		partitionIndex := partition(arr, left, right) //此时index左右分别是小于大于arr[index]的
+		_quicksort(arr, left, partitionIndex - 1)
+		_quicksort(arr, partitionIndex + 1, right)
+	}
+	return arr
 }
 
+//返回定好的index
 func partition(arr []int, left, right int) int {
-        pivot := left
-        index := pivot + 1
+	pivot := left
+	index := pivot + 1 //表示当前确定位置的下标
 
-        for i := index; i <= right; i++ {
-                if arr[i] < arr[pivot] {
-                        swap(arr, i, index)
-                        index += 1
-                }
-        }
-        swap(arr, pivot, index-1)
-        return index - 1
+	for i := index; i <= right; i++{
+		if arr[i] < arr[pivot]{
+			arr[i], arr[index] = arr[index], arr[i]
+			index += 1
+		}
+	}
+	arr[pivot] , arr[index - 1] = arr[index - 1], arr[pivot]
+
+	return index - 1
 }
 
-func swap(arr []int, i, j int) {
-        arr[i], arr[j] = arr[j], arr[i]
+func findN(arr []int, left, right, N int) int {
+
+		index := partition(arr, left, right)
+		if N - 1 == index{
+			return arr[index]
+		}else if N - 1 > index{
+			return findN(arr, index + 1, right, N)
+		}else{
+			return findN(arr, left, index - 1, N)
+		}
+
+		return -1
+}
+```
+
+双路快排
+
+![img](../Untitled.assets/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8xNTIwMzU2NS0zZWIzYzI3MGEwZWQyNjJjLmpwZw)
+
+```
+i，j均指向当前要判定的元素e
+左边的情况：
+1）若arr[i]<v，直接i++
+2）若arr[i]>=v，去判定右边的情况，若arr[j]>v，直接j--
+3）直到arr[i]>=v且arr[j]<=v时，交换arr[i],arr[j]的值，之后i++，j--，直到i>j结束判定
+
+这样即使arr[i]=arr[j]，也会进行一次交换，因此相同的值会较平均的分配在左右两边，
+减轻分区时的不平衡性，最后左区间是<=v，右区间是>=v
+```
+
+```go
+func Partition3(arr []int, l, r int) int {
+	v := arr[l]
+
+	//  arr[l+1...j] <= v ; arr[j+1...i] >= v
+	leftI := l + 1
+	rightI := r
+	for {
+		switch {
+		case leftI > rightI:
+			// 能通过这步,说明索引不合法,不合法则说明遍历结束
+			arr[l], arr[rightI] = arr[rightI], v
+			return rightI
+		// 判定左边
+		case arr[leftI] < v:
+			leftI++
+			// 判定右边
+		case arr[rightI] > v:
+			rightI--
+		default:
+			// 以上3点都不成立,说明arr[leftI]>=v,arr[rightI]<=v,两者需要交换
+			arr[leftI], arr[rightI] = arr[rightI], arr[leftI]
+			leftI++
+			rightI--
+		}
+	}
+}
+```
+
+三路快排
+
+```
+3路快排的思路是将区间分为3部分，左边小于v，中间等于v，右边大于v，之后中间不再判定，
+再分别对左边，右边进行分区，直至排序结束，如下图示：
+分3种情况，e为待判定元素：
+1）e==v，i++
+2）e<v，交换arr[lt+1]，arr[i]位置，之后lt++，i++
+3）e>v，交换arr[i]，arr[gt+1]位置，之后gt--
+4）最后交换arr[l]，arr[lt]位置
+```
+
+![img](../Untitled.assets/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8xNTIwMzU2NS1kMzFjMDJkZGQ5Y2IwNDgxLmpwZw)
+
+```go
+func sortThreeWays(arr []int, l, r int) (lt, gt int) {
+	v := arr[l]
+
+	lt = l     // arr[l+1...lt] < v
+	gt = r + 1 // arr[gt...r] > v
+	i := l + 1 // arr[lt+1...i) == v 半开半闭
+	for {
+		switch {
+		case i >= gt:
+			// 这步未执行前,lt都是指向最后一个小于v的值,
+			// 执行交换后,lt指向从左到右第一个等于v的值
+			arr[l], arr[lt] = arr[lt], v
+			return lt, gt
+		case arr[i] == v:
+			i++
+		case arr[i] < v:
+			lt++
+			arr[i], arr[lt] = arr[lt], arr[i]
+			i++
+		default:
+			gt--
+			arr[i], arr[gt] = arr[gt], arr[i]
+		}
+	}
 }
 ```
 
@@ -509,24 +612,7 @@ func swap(arr []int, i, j int) {
 
 该算法是**线性级别**的，假设每次能将数组二分，那么比较的总次数为 (N+N/2+N/4+..)，直到找到第 k 个元素，这个和显然小于 2N。
 
-```java
-public int select(int[] nums, int k) {
-    int left = 0, right = nums.length - 1;
-    while (right > left) {
-        int pivot = partition2(nums, left, right);
-        if (pivot == k) {
-            return nums[k];
-        } else if (pivot > k) {
-            right = pivot - 1;
-        } else {
-            left = pivot + 1;
-        }
-    }
-    return nums[k];
-}
-```
 
-Java 中的 Array 类的 **sort 方法**使用**快速排序**对**基本类型的数组**进行升序排序。
 
 
 
