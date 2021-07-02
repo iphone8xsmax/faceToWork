@@ -1147,7 +1147,7 @@ github地址：[Leaf](https://github.com/Meituan-Dianping/Leaf)
 
 
 
-### 3PC（三阶段提交）
+#### 3PC（三阶段提交）
 
 因为 2PC 存在的一系列问题，比如单点，容错机制缺陷等等，从而产生了 **3PC（三阶段提交）** 。这三个阶段就是：
 
