@@ -4,139 +4,139 @@
 
 ##### 1. LRU算法
 
-```java
-private static class LRUNode {
-    String key;
-    Object value;
-    LRUNode next;
-    LRUNode pre;
+利用双端队列和map实现
 
-    public LRUNode(String key, Object value) {
-        this.key = key;
-        this.value = value;
-    }
+```go
+package main
+
+import (
+	"container/list"
+	"errors"	
+)
+
+// 保存缓存信息
+type CacheNode struct {
+	Key,Value interface{}	
 }
+
+// 生成新的结点
+func (cnode *CacheNode)NewCacheNode(k,v interface{})*CacheNode{
+	return &CacheNode{k,v}
+}
+
+// LRU缓存类
+type LRUCache struct {
+	Capacity int	// 容量
+	dlist *list.List	// 双端链表
+	cacheMap map[interface{}]*list.Element	//缓存用的 Map，value 是链表结点
+}
+
+// 生成新的LRU缓存对象，初始化传入缓存大小
+func NewLRUCache(cap int)(*LRUCache){
+	return &LRUCache{
+				Capacity:cap,
+				dlist: list.New(),
+				cacheMap: make(map[interface{}]*list.Element)}
+}
+
+// 获取当前LRU缓存的大小
+func (lru *LRUCache)Size()(int){
+	return lru.dlist.Len()
+}
+
+// 更新LRU
+func (lru *LRUCache)Set(k,v interface{})(error){
+	if lru.dlist == nil {
+		return errors.New("LRUCache结构体未初始化.")		
+	}
+ 	// 如果结点存在，就把结点往前移
+	if pElement,ok := lru.cacheMap[k]; ok {		
+		lru.dlist.MoveToFront(pElement)
+		pElement.Value.(*CacheNode).Value = v // 设置LRU结点的值中缓存结点的值
+		return nil
+	}
+ 	
+    // 如果不存在就从前端进入链表
+	newElement := lru.dlist.PushFront( &CacheNode{k,v} )
+	lru.cacheMap[k] = newElement // 缓存键值对
+ 	
+    // 如果当前LRU缓存满了
+	if lru.dlist.Len() > lru.Capacity {		
+		//移掉最后一个
+		lastElement := lru.dlist.Back()
+		if lastElement == nil {
+			return nil
+		}
+        // 从链表中拿到这个最后的结点，从map中也删除
+		cacheNode := lastElement.Value.(*CacheNode)
+		delete(lru.cacheMap,cacheNode.Key)
+		lru.dlist.Remove(lastElement)
+	}
+	return nil
+}
+ 
+// 获取LRU，传入Key，返回结点值，是否存在，错误值
+func (lru *LRUCache)Get(k interface{})(v interface{},ret bool,err error){
+	if lru.cacheMap == nil {
+		return v,false,errors.New("LRUCache结构体未初始化.")		
+	}
+ 	
+    // 如果结点信息存在，把这个结点移到链表头部
+	if pElement,ok := lru.cacheMap[k]; ok {		
+		lru.dlist.MoveToFront(pElement)		
+		return pElement.Value.(*CacheNode).Value,true,nil
+	}
+	return v,false,nil
+}
+ 
+// 移除结点
+func (lru *LRUCache)Remove(k interface{})(bool){
+	if lru.cacheMap == nil {
+		return false
+	}
+ 	
+    // 如果map中存在这个结点，删除，从链表中也进行删除
+	if pElement,ok := lru.cacheMap[k]; ok {
+		cacheNode := pElement.Value.(*CacheNode)
+		delete(lru.cacheMap,cacheNode.Key)		
+		lru.dlist.Remove(pElement)
+		return true
+	}
+	return false
+}
+
+
+func main(){
+	lru := NewLRUCache(3)
+ 
+	lru.Set(10,"value1")
+	lru.Set(20,"value2")
+	lru.Set(30,"value3")
+	lru.Set(10,"value4")
+	lru.Set(50,"value5")
+ 
+	fmt.Println("LRU Size:",lru.Size())
+	v,ret,_ := lru.Get(30)
+	if ret  {
+		fmt.Println("Get(30) : ",v)
+	}
+ 
+	if lru.Remove(30) {
+		fmt.Println("Remove(30) : true ")
+	}else{
+		fmt.Println("Remove(30) : false ")
+	}
+	fmt.Println("LRU Size:",lru.Size())
 ```
 
-```java
-public class LRUCache {
+运行结果
 
-    Map<String, LRUNode> map = new HashMap<>();
-    LRUNode head;
-    LRUNode tail;
-    // 缓存最⼤容量大于1
-    int capacity;
-
-    public LRUCache(int capacity) {
-        this.capacity = capacity;
-    }
-
-    /**
-	 * 插入元素
-	 * @param key 键
-	 * @param value 值
-	 */
-    public void put(String key, Object value) {
-        // 说明缓存中没有任何元素
-        if (head == null) {
-            head = new LRUNode(key, value);
-            tail = head;
-            map.put(key, head);
-        }
-        // 说明缓存中已经存在这个元素了
-        LRUNode node = map.get(key);
-        if (node != null) {
-            // 更新值
-            node.value = value;
-            // 把这个结点从链表删除并且插⼊到头结点
-            removeAndInsert(node);
-        } else {
-            // 说明当前缓存不存在这个值
-            LRUNode newHead = new LRUNode(key, value);
-            // 此处溢出则需要删除最近最近未使用的节点
-            if (map.size() >= capacity) {
-                map.remove(tail.key);
-                // 删除尾结点
-                tail = tail.pre;
-                tail.next = null;
-            }
-            map.put(key, newHead);
-            // 将新的结点插入链表头部
-            newHead.next = head;
-            head.pre = newHead;
-            head = newHead;
-        }
-    }
-
-    /**
-	 * 从缓存中取值
-	 */
-    public Object get(String key) {
-        LRUNode node = map.get(key);
-        // 如果有值则需要将这个结点放到链表头部
-        if (node != null) {
-            // 把这个节点删除并插⼊到头结点
-            removeAndInsert(node);
-            return node.value;
-        }
-        return null;
-    }
-
-    private void removeAndInsert(LRUNode node) {
-        // 特殊情况先判断，例如该节点是头结点或是尾部节点
-        if (node == head) {
-            return;
-        } else if (node == tail) {
-            tail = node.pre;
-            tail.next = null;
-        } else {
-            node.pre.next = node.next;
-            node.next.pre = node.pre;
-        }
-        // 插⼊到头结点
-        node.next = head;
-        node.pre = null;
-        head.pre = node;
-        head = node;
-    }
-}
+```go
+LRU Size: 3
+Get(30) :  value3
+Remove(30) : true
+LRU Size: 2
 ```
 
-##### 2. 快排
 
-```java
-public static void quickSort(int[] array) {
-    if (array == null || array.length < 2) return;
-    quickSort(array, 0, array.length - 1);
-}
-
-private static void quickSort(int[] array, int left, int right) {
-    if (left < right) {
-        int pivot = partition(array, left, right);
-        quickSort(array, left, pivot - 1);
-        quickSort(array, pivot + 1, right);
-    }
-}
-
-private static int partition(int[] array, int left, int right) {
-    // 挑选一个随机的pivot索引并交换到第一个位置上
-    int randomPivot = left + (int) (Math.random() * (right - left + 1));
-    swap(array, randomPivot, left);
-    // 数组第一个值为pivot值
-    int pivotValue = array[left];
-    int i = left + 1;
-    int j = right;
-    while (true) {
-        while (i <= j && array[i] <= pivotValue) i++;
-        while (i <= j && array[j] >= pivotValue) j--;
-        // 数组越界退出
-        if(i >= j) break;
-        // 交换两个值
-        swap(array, i, j);
-    }
-    // 交换第一个pivot元素和j位置
-    swap(array, left, j);
-    return j;
-}
-```
 
